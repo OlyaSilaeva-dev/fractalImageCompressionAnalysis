@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: fractal_app
+    volumes:
+      - ./images:/app/images   # локальная папка с картинками
+    ports:
+      - "8080:8080"            # если позже будет веб-интерфейс
+    restart: unless-stopped

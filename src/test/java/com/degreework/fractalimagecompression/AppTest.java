@@ -1,4 +1,4 @@
-package com.cryptography;
+package com.degreework.fractalimagecompression;
 
 import org.junit.jupiter.api.Test;
 
