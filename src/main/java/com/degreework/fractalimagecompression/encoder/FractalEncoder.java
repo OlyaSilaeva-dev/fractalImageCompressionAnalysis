@@ -17,6 +17,8 @@ import static com.degreework.fractalimagecompression.utils.Utils.applyTransforma
 
 public class FractalEncoder {
 
+    private static final double EPSILON = 1e-10;
+
     /**
      * @param img        Исходное изображение
      * @param sourceSize Размер доменного блока. Обычно в 2 раза больше,
@@ -102,7 +104,7 @@ public class FractalEncoder {
         double s = 0.0;
         double o = sumD / n;
 
-        if (Math.abs(denominator) > 1e-10) {
+        if (Math.abs(denominator) > EPSILON) {
             s = (n * sumSD - sumS * sumD) / denominator;
             o = (sumD - s * sumS) / n;
         }
