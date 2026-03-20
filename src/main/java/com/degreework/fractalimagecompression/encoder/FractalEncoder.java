@@ -1,25 +1,29 @@
 package com.degreework.fractalimagecompression.encoder;
 
+import com.degreework.fractalimagecompression.model.BlockTransformation;
 import com.degreework.fractalimagecompression.model.Transformation;
 import com.degreework.fractalimagecompression.model.TransformedBlock;
-import org.ejml.simple.SimpleMatrix;
-import org.opencv.core.Mat;
-import org.opencv.core.Rect;
-import org.opencv.core.Size;
+import com.degreework.fractalimagecompression.partitioner.ImagePartitioner;
+import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static com.degreework.fractalimagecompression.utils.Utils.applyTransformation;
 
 public class FractalEncoder {
+    private final ImagePartitioner partitioner;
 
     private static final double EPSILON = 1e-10;
 
+    public FractalEncoder(ImagePartitioner partitioner) {
+        this.partitioner = partitioner;
+    }
+
     /**
+     * Реализация классического алгоритма Барнсли-Джаквина для фрактального сжатия изображения
      * @param img        Исходное изображение
      * @param sourceSize Размер доменного блока. Обычно в 2 раза больше,
      *                   чем destSize (например, 16x16 пикселей).
@@ -32,29 +36,24 @@ public class FractalEncoder {
      * @return «Инструкция по сборке» изображения. Она содержит список правил
      * для каждого рангового блока изображения.
      */
-    public List<List<Transformation>> compress(Mat img, int sourceSize, int destSize, int step) {
-        int iCount = img.rows() / destSize;
-        int jCount = img.cols() / destSize;
+    public List<BlockTransformation> compress(Mat img, int sourceSize, int destSize, int step) {
+        List<Rect> rangeRects = partitioner.partition(img, destSize, destSize);
 
-        List<List<Transformation>> transformations = Collections.synchronizedList(
-                new ArrayList<>(Collections.nCopies(iCount, null))
-        );
+        List<BlockTransformation> transformations =
+                Collections.synchronizedList(new ArrayList<>());
 
-        List<TransformedBlock> sourceBlocks = generateSourceBlocks(img, sourceSize, destSize, step);
+        List<TransformedBlock> sourceBlocks =
+                generateSourceBlocks(img, sourceSize, destSize, step);
 
-        IntStream.range(0, iCount).parallel().forEach(i -> {
-            List<Transformation> row = new ArrayList<>();
+        rangeRects.parallelStream().forEach(rect -> {
 
-            for (int j = 0; j < jCount; j++) {
-                Rect rect = new Rect(j * destSize, i * destSize, destSize, destSize);
-                Mat destBlock = img.submat(rect);
+            Mat destBlock = img.submat(rect);
 
-                row.add(findBestMatch(destBlock, sourceBlocks));
-                destBlock.release();
-            }
+            Transformation best = findBestMatch(destBlock, sourceBlocks);
 
-            transformations.set(i, row);
-            System.out.println("Processing row: " + i + ", " + jCount);
+            transformations.add(new BlockTransformation(rect, best));
+
+            destBlock.release();
 
         });
 
@@ -82,76 +81,112 @@ public class FractalEncoder {
     }
 
     private double[] findContrastBrightness(Mat destBlock, Mat sourceBlock) {
+
         int n = (int) sourceBlock.total();
+
+        byte[] sourceData = new byte[n];
+        byte[] destData = new byte[n];
+
+        sourceBlock.get(0, 0, sourceData);
+        destBlock.get(0, 0, destData);
+
         double sumS = 0;
         double sumD = 0;
         double sumSS = 0;
         double sumSD = 0;
 
-        for (int r = 0; r < sourceBlock.rows(); r++) {
-            for (int c = 0; c < sourceBlock.cols(); c++) {
-                double s = sourceBlock.get(r, c)[0];
-                double d = destBlock.get(r, c)[0];
+        for (int i = 0; i < n; i++) {
 
-                sumS += s;
-                sumD += d;
-                sumSS += s * s;
-                sumSD += s * d;
-            }
+            double s = sourceData[i] & 0xFF;
+            double d = destData[i] & 0xFF;
+
+            sumS += s;
+            sumD += d;
+            sumSS += s * s;
+            sumSD += s * d;
         }
 
         double denominator = (n * sumSS - sumS * sumS);
-        double s = 0.0;
-        double o = sumD / n;
+
+        double contrast = 0.0;
+        double brightness = sumD / n;
 
         if (Math.abs(denominator) > EPSILON) {
-            s = (n * sumSD - sumS * sumD) / denominator;
-            o = (sumD - s * sumS) / n;
+            contrast = (n * sumSD - sumS * sumD) / denominator;
+            brightness = (sumD - contrast * sumS) / n;
         }
 
-        if (s > 1.0) s = 1.0;
-        if (s < -1.0) s = -1.0;
+        if (contrast > 1.0) contrast = 1.0;
+        if (contrast < -1.0) contrast = -1.0;
 
-        return new double[]{s, o};
+        return new double[]{contrast, brightness};
     }
 
     private double calculateError(Mat destBlock, Mat sourceBlock, double contrast, double brightness) {
+        int n = (int) destBlock.total();
+
+        byte[] sourceData = new byte[n];
+        byte[] destData = new byte[n];
+
+        sourceBlock.get(0, 0, sourceData);
+        destBlock.get(0, 0, destData);
+
         double sum = 0;
 
-        for (int i = 0; i < destBlock.rows(); i++) {
-            for (int j = 0; j < destBlock.cols(); j++) {
-                double diff = destBlock.get(i, j)[0] - (contrast * sourceBlock.get(i, j)[0] + brightness);
-                sum += diff * diff;
-            }
+        for (int i = 0; i < n; i++) {
+
+            double s = sourceData[i] & 0xFF;
+            double d = destData[i] & 0xFF;
+
+            double diff = d - (contrast * s + brightness);
+
+            sum += diff * diff;
         }
 
         return sum;
     }
 
-    private List<TransformedBlock> generateSourceBlocks(Mat img, int sSize, int dSize, int step) {
+    /**
+     * Генерация всех возможных доменных блоков с их трансформациями
+     * @param img Исходное изображение
+     * @param domainSize Размер доменного блока (должен быть в 2 раза больше рангового)
+     * @param rangeSize Размер рангового блока
+     * @param step Шаг сканирования доменных блоков
+     * @return Список трансформированных доменных блоков
+     */
+    private List<TransformedBlock> generateSourceBlocks(Mat img, int domainSize, int rangeSize, int step) {
         List<TransformedBlock> sourceBlocks = new ArrayList<>();
 
-        for (int k = 0; k <= (img.rows() - sSize) / step; k++) {
-            for (int l = 0; l <= (img.cols() - sSize) / step; l++) {
-                Rect rect = new Rect(l * step, k * step, sSize, sSize);
-                Mat source = img.submat(rect);
+        for (int y = 0; y <= img.rows() - domainSize; y += step) {
+            for (int x = 0; x <= img.cols() - domainSize; x += step) {
+                Mat domainBlock = img.submat(new Rect(x, y, domainSize, domainSize));
 
-                Mat reduced = new Mat();
-                Imgproc.resize(source, reduced, new Size(dSize, dSize));
+                Mat reducedBlock = new Mat();
+                Imgproc.resize(domainBlock, reducedBlock, new Size(rangeSize, rangeSize), 0, 0, Imgproc.INTER_AREA);
 
-                int[] directions = {1, -1};
-                int[] angles = {0, 90, 180, 270};
-                for (int direction : directions) {
-                    for (int angle : angles) {
-                        Mat transformed = applyTransformation(reduced, direction, angle);
-                        sourceBlocks.add(new TransformedBlock(transformed, k, l, direction, angle));
+                int[] flipValues = {-1, 0, 1};
+                int[] angleValues = {0, 90, 180, 270};
+
+                for (int flip : flipValues) {
+                    for (int angle : angleValues) {
+                        Mat transformed = applyTransformation(reducedBlock, flip, angle);
+
+                        sourceBlocks.add(new TransformedBlock(
+                                transformed,
+                                x / step,
+                                y / step,
+                                flip,
+                                angle
+                        ));
                     }
                 }
 
-                source.release();
+                reducedBlock.release();
+                domainBlock.release();
             }
         }
 
         return sourceBlocks;
     }
+
 }

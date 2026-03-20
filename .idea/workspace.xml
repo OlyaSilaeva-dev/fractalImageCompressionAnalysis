@@ -5,24 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6eaad46d-b85b-4a07-95a5-9cf99cd3994e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/decoder/FractalDecoder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/encoder/FractalEncoder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/exceptions/ImageReadingException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/io/ImageLoader.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/metrics/CompressionRatio.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/metrics/Metric.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/metrics/PSNR.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/metrics/SSIM.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/model/Transformation.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/model/TransformedBlock.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/utils/Utils.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/visualization/ImageViewer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/model/BlockTransformation.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/partitioner/ImagePartitioner.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/partitioner/impl/GridPartitioner.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/partitioner/impl/QuadTreePartitioner.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/cryptography/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/App.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/cryptography/AppTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/degreework/fractalimagecompression/AppTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/App.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/decoder/FractalDecoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/decoder/FractalDecoder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/encoder/FractalEncoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/encoder/FractalEncoder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/metrics/CompressionRatio.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/metrics/CompressionRatio.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/metrics/Metric.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/metrics/Metric.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/metrics/PSNR.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/metrics/PSNR.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/metrics/SSIM.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/metrics/SSIM.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/utils/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/utils/Utils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/visualization/ImageViewer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/visualization/ImageViewer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,29 +46,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.App.executor": "Run",
-    "Application.com.degreeWork.fractalImageCompressionAnalysis.App.executor": "Run",
-    "Application.com.degreework.fractalimagecompression.App.executor": "Run",
-    "Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/src/GitHub/YandexContest",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "reference.projectsettings.compiler.javacompiler",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.App.executor&quot;: &quot;Run&quot;,
+    &quot;Application.com.degreeWork.fractalImageCompressionAnalysis.App.executor&quot;: &quot;Run&quot;,
+    &quot;Application.com.degreework.fractalimagecompression.App.executor&quot;: &quot;Run&quot;,
+    &quot;Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/src/GitHub/fractalImageCompressionAnalysis&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.projectsettings.compiler.javacompiler&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\src\GitHub\fractalImageCompressionAnalysis\src\main\resources" />
@@ -156,11 +152,41 @@
       <workItem from="1772043684558" duration="185000" />
       <workItem from="1772096447271" duration="3413000" />
       <workItem from="1772382424460" duration="436000" />
-      <workItem from="1772459723573" duration="11872000" />
+      <workItem from="1772459723573" duration="12459000" />
+      <workItem from="1772723138134" duration="7765000" />
+      <workItem from="1773586027719" duration="423000" />
+      <workItem from="1773657221410" duration="21337000" />
+      <workItem from="1773859000502" duration="3722000" />
+      <workItem from="1774001368479" duration="3795000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/App.java</url>
+          <line>41</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/metrics/SSIM.java</url>
+          <line>13</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/src/main/java/com/degreework/fractalimagecompression/metrics/SSIM.java</url>
+          <line>11</line>
+          <properties class="com.degreework.fractalimagecompression.metrics.SSIM" method="compute">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
