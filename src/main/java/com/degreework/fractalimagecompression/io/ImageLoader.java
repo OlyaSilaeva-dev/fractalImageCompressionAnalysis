@@ -29,17 +29,37 @@ public class ImageLoader {
     }
 
     public static Mat bufferedImageToMat(BufferedImage bi) {
-        Mat mat = new Mat(bi.getHeight(), bi.getWidth(), CvType.CV_8UC3);
+        int width = bi.getWidth();
+        int height = bi.getHeight();
 
-        BufferedImage convertedImg = new BufferedImage(bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-        convertedImg.getGraphics().drawImage(bi, 0, 0, null);
+        int numComponents = bi.getColorModel().getNumComponents();
 
-        byte[] data = ((DataBufferByte) convertedImg.getRaster().getDataBuffer()).getData();
-        mat.put(0, 0, data);
+        if (numComponents == 1) {
+            Mat mat = new Mat(height, width, CvType.CV_8UC1);
 
-        return mat;
+            BufferedImage grayImg = bi;
+            if (bi.getType() != BufferedImage.TYPE_BYTE_GRAY) {
+                grayImg = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+                grayImg.getGraphics().drawImage(bi, 0, 0, null);
+            }
+
+            byte[] data = ((DataBufferByte) grayImg.getRaster().getDataBuffer()).getData();
+            mat.put(0, 0, data);
+            return mat;
+        } else {
+            Mat mat = new Mat(height, width, CvType.CV_8UC3);
+
+            BufferedImage bgrImg = bi;
+            if (bi.getType() != BufferedImage.TYPE_3BYTE_BGR) {
+                bgrImg = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+                bgrImg.getGraphics().drawImage(bi, 0, 0, null);
+            }
+
+            byte[] data = ((DataBufferByte) bgrImg.getRaster().getDataBuffer()).getData();
+            mat.put(0, 0, data);
+            return mat;
+        }
     }
-
     public static BufferedImage matToBufferedImage(Mat matrix) {
         int type = BufferedImage.TYPE_BYTE_GRAY;
         if (matrix.channels() > 1) type = BufferedImage.TYPE_3BYTE_BGR;

@@ -3,16 +3,19 @@ package com.degreework.fractalimagecompression.metrics;
 import com.degreework.fractalimagecompression.model.BlockTransformation;
 import org.opencv.core.Mat;
 
+import java.io.File;
 import java.util.List;
 
 public class CompressionRatio {
 
-    private static final int BYTES_PER_TRANSFORMATION = 48;
+   public static double compute(Mat original, String fractalFilePath) {
+        double originalSize = original.total();
+        double compressedSize = new File(fractalFilePath).length();
 
-    public double compute(Mat original,
-                          List<BlockTransformation> transformationList) {
-        double originalSize = original.total() * original.elemSize();
-        double compressedSize = transformationList.size() * BYTES_PER_TRANSFORMATION;
+       if (compressedSize == 0) {
+           return 0;
+       }
+
         return originalSize / compressedSize;
     }
 }

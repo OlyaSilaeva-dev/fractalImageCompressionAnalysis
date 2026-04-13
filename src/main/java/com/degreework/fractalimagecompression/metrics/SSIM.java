@@ -71,11 +71,18 @@ public class SSIM implements Metric {
 
         Core.multiply(t1, t2, t1);
 
-        Mat ssimMap = new Mat();
-        Core.divide(t3, t1, ssimMap);
+        Mat ssimMat = new Mat();
+        Core.divide(t3, t1, ssimMat);
 
-        Scalar mssim = Core.mean(ssimMap);
+        Scalar mssim = Core.mean(ssimMat);
 
-        return mssim.val[0];
+        int channels = original.channels();
+        double ssim = 0.0;
+
+        for (int i = 0; i < channels; i++) {
+            ssim += mssim.val[i];
+        }
+
+        return ssim / channels;
     }
 }

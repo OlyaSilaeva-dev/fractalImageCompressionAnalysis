@@ -16,15 +16,23 @@ public class PSNR implements Metric {
         Core.multiply(diff, diff, diff);
         
         Scalar sum = Core.sumElems(diff);
-        
-        double mse = sum.val[0] / (original.total());
-        
+
+        int channels = original.channels();
+        double pixels = original.total();
+
+        double mse = 0.0;
+
+        for (int i = 0; i < channels; i++) {
+            mse += sum.val[i];
+        }
+
+        mse /= (pixels * channels);
+
         if (mse == 0) {
             return Double.POSITIVE_INFINITY;
         }
-        
+
         double maxPixel = 255.0;
-        
         return 10 * Math.log10((maxPixel * maxPixel) / mse);
     }
 }

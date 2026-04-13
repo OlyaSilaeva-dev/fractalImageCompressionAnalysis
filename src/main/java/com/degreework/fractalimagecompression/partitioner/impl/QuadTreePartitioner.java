@@ -59,16 +59,20 @@ public class QuadTreePartitioner implements ImagePartitioner {
     }
 
     private double calculateVariance(Mat block) {
+        int channels = block.channels();
+        int n = (int) block.total() * channels;
 
         double sum = 0;
         double sumSq = 0;
-        int n = (int) block.total();
 
         for (int i = 0; i < block.rows(); i++) {
             for (int j = 0; j < block.cols(); j++) {
-                double val = block.get(i, j)[0];
-                sum += val;
-                sumSq += val * val;
+                double[] pixel = block.get(i, j);
+                for (int k = 0; k < channels; k++) {
+                    double val = pixel[k];
+                    sum += val;
+                    sumSq += val * val;
+                }
             }
         }
 
