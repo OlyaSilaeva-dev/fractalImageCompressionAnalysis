@@ -2,6 +2,7 @@ package com.degreework.fractalimagecompression.io;
 
 import com.degreework.fractalimagecompression.model.BlockTransformation;
 import com.degreework.fractalimagecompression.model.Transformation;
+import org.opencv.core.Mat;
 import org.opencv.core.Rect;
 
 import java.io.*;
@@ -12,6 +13,29 @@ import java.util.zip.GZIPInputStream;
 
 public class FractalSerializer {
     private static final int MAGIC_NUMBER = 0x46524143;
+
+    public static void saveColorImage(String basePath, Mat img, List<List<BlockTransformation>> channelTransforms) throws IOException {
+        String[] suffixes = {"_B", "_G", "_R"};
+        for (int c = 0; c < 3; c++) {
+            String path = basePath + suffixes[c] + ".fractal";
+            FractalSerializer.saveToFile(path, img.width(), img.height(), channelTransforms.get(c));
+            System.out.println("Saved channel " + c + " to " + path);
+        }
+    }
+
+    public List<List<BlockTransformation>> loadColorImage(String basePath) throws IOException {
+        String[] suffixes = {"_B", "_G", "_R"};
+        List<List<BlockTransformation>> channelTransforms = new ArrayList<>();
+
+        for (int c = 0; c < 3; c++) {
+            String path = basePath + suffixes[c] + ".fractal";
+            List<BlockTransformation> transforms = FractalSerializer.loadFromFile(path);
+            channelTransforms.add(transforms);
+            System.out.println("Loaded channel " + c + " from " + path);
+        }
+
+        return channelTransforms;
+    }
 
     public static void saveToFile(String path, int imgWidth, int imgHeight, List<BlockTransformation> blocks) throws IOException {
         try (DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(new FileOutputStream(path)))) {
@@ -96,7 +120,6 @@ public class FractalSerializer {
                     contrast[j] = c / 1e8;
                     brightness[j] = b / 1e6;
                 }
-
 
                 Rect rect = new Rect(x, y, width, height);
                 Transformation trans = new Transformation(k, l, flip, angle, contrast, brightness);
